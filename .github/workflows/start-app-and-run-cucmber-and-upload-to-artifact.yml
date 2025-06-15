@@ -32,10 +32,10 @@ jobs:
       - name: Build the child project (without tests)
         run: ./gradlew :sample-cucumber-app:build -x test
 
-      - name: Start the Spring Boot app (from child project)
+      - name: Start the sample-cucumber-app
         run: java -jar sample-cucumber-app/build/libs/*.jar &
 
-      - name: Wait for app to start (adjust port and timeout as needed)
+      - name: Wait for app to start
         run: |
           echo "Waiting for the app to start..."
           for i in {1..30}; do
@@ -50,11 +50,14 @@ jobs:
       - name: Run Cucumber integration tests from child project
         run: |
           ./gradlew :sample-cucumber-app:test -Dcucumber.filter.tags="${{ github.event.inputs.tag }}"
-          echo "CURRENT_DATETIME=$(date -u '+%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
+
+      - name: Set timestamp for artifact naming
+        if: always()
+        run: echo "CURRENT_DATETIME=$(date -u '+%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
 
       - name: Upload Cucumber HTML Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cucumber-report-for-${{ github.event.inputs.tag }}-ran-at-${{ env.CURRENT_DATETIME }}
+          name: cucumber-report-for-Tag-${{ github.event.inputs.tag }}-ran-at-${{ env.CURRENT_DATETIME }}
           path: sample-cucumber-app/build/reports
