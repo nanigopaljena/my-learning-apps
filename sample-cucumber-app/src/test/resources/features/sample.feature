@@ -1,5 +1,5 @@
 @Sample
-Feature: Message API
+Feature: Sample 1 Tests
 
   Scenario: Successful test
     Given the initial setup is done

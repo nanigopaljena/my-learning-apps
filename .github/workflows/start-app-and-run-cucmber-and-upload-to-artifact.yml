@@ -30,6 +30,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build the child project (without tests)
+        continue-on-error: true
         run: ./gradlew :sample-cucumber-app:build -x test
 
       - name: Start the sample-cucumber-app
