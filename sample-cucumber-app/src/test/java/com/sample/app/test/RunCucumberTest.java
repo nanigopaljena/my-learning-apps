@@ -17,7 +17,7 @@ import static io.cucumber.junit.platform.engine.Constants.*;
 @SelectClasspathResource("features")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.sample.app.test")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty, html:build/reports/cucumber.html")
-@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@Sample2")
+//@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@Sample2")
 @CucumberContextConfiguration
 @ContextConfiguration
 @SpringBootTest
