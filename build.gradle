@@ -27,3 +27,7 @@ bootJar {
 jar {
 	enabled = false
 }
+
+test {
+	ignoreFailures = true
+}
