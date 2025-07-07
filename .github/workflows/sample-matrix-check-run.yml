@@ -83,16 +83,25 @@ jobs:
     needs: run-checks
     runs-on: ubuntu-latest
     if: always()
-    strategy:
-      matrix:
-        environment: [dev, test] # must match possible matrix values
     steps:
-      - name: Fail if any environment failed
+      - name: Check if any matrix job failed
         run: |
-          echo "🔍 Verifying result for environment: ${{ matrix.environment }}"
-          result="${{ needs.run-checks.outputs.result }}"
+          echo "Checking matrix job results..."
+          echo "Full matrix output:"
+          echo '${{ toJson(needs.run-checks) }}'
           
-          if [[ "$result" == "failure" ]]; then
+          has_failure=false
+          
+          # Loop over each matrix environment explicitly
+          for ENV in dev test; do
+            result="${{ needs.run-checks.outputs.result }}"
+            echo "Result for $ENV: $result"
+            if [[ "$result" == "failure" ]]; then
+              has_failure=true
+            fi
+          done
+          
+          if [ "$has_failure" = true ]; then
             echo "❌ One or more environments failed."
             exit 1
           else
