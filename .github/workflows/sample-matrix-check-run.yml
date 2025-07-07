@@ -1,0 +1,62 @@
+name: Kafka Env Check Matrix
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run (use "all" for both)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - dev
+          - test
+
+jobs:
+  determine-environments:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set matrix dynamically
+        id: set-matrix
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "all" ]]; then
+            echo "matrix=[\"dev\",\"test\"]" >> $GITHUB_OUTPUT
+          else
+            echo "matrix=[\"${{ github.event.inputs.environment }}\"]" >> $GITHUB_OUTPUT
+
+  run-checks:
+    needs: determine-environments
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: ${{ fromJson(needs.determine-environments.outputs.matrix) }}
+    continue-on-error: true
+    outputs:
+      result: ${{ steps.set-result.outputs.result }}
+
+    env:
+      CHECK: ${{ secrets.CHECK }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Run Python check for ${{ matrix.environment }}
+        id: run-check
+        run: |
+          echo "Environment: ${{ matrix.environment }}"
+          python hello.py "${{ env.CHECK }}"
+
+      - name: Set result output
+        id: set-result
+        run: |
+          if [ "${{ steps.run-check.outcome }}" == "failure" ]; then
+            echo "result=failure" >

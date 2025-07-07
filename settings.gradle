@@ -2,3 +2,4 @@ rootProject.name = 'my-learning-apps'
 
 include 'sample-cucumber-app'
 include 'sample-kafka-app'
+include 'sample-git-workflow-run'
