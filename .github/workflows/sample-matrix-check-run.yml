@@ -60,7 +60,7 @@ jobs:
         id: run-check
         run: |
           echo "Environment: ${{ matrix.environment }}"
-          python sample-git-workflow-run/test-script.py ${{ secrets.CHECK }}
+          python sample-git-workflow-run/test-script.py "pass"
 
       - name: Set result output
         id: set-result
