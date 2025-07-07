@@ -45,7 +45,7 @@ jobs:
       result: ${{ steps.set-result.outputs.result }}
 
     env:
-      CHECK: ${{ secrets.CHECK }}
+      SEC_VALUE: ${{ secrets.MY_TEST_SECRET }}
 
 
     steps:
@@ -57,19 +57,19 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Validate CHECK
+      - name: Validate SEC_VALUE
         run: |
-          if [ -z "$CHECK" ]; then
-            echo "❌ CHECK secret is not set!"
+          if [ -z "$SEC_VALUE" ]; then
+            echo "❌ SEC_VALUE secret is not set!"
             exit 1
           fi
-          echo "✅ CHECK=$CHECK"
+          echo "✅ SEC_VALUE=$SEC_VALUE"
 
       - name: Run Python check for ${{ matrix.environment }}
         id: run-check
         run: |
           echo "Environment: ${{ matrix.environment }}"
-          python sample-git-workflow-run/test-script.py ${{ env.CHECK }}
+          python sample-git-workflow-run/test-script.py ${{ env.SEC_VALUE }}
 
       - name: Set result output
         id: set-result
