@@ -33,20 +33,19 @@ jobs:
 
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
-
   run-checks:
     needs: determine-environments
     runs-on: ubuntu-latest
     strategy:
       matrix:
         environment: ${{ fromJson(needs.determine-environments.outputs.matrix) }}
+    environment: ${{ matrix.environment }}  # 👈 Required to access environment-level secrets
     continue-on-error: true
     outputs:
       result: ${{ steps.set-result.outputs.result }}
 
     env:
       SEC_VALUE: ${{ secrets.MY_TEST_SECRET }}
-
 
     steps:
       - name: Checkout code
@@ -69,7 +68,7 @@ jobs:
         id: run-check
         run: |
           echo "Environment: ${{ matrix.environment }}"
-          python sample-git-workflow-run/test-script.py ${{ env.SEC_VALUE }}
+          python sample-git-workflow-run/test-script.py "$SEC_VALUE"
 
       - name: Set result output
         id: set-result
@@ -78,4 +77,24 @@ jobs:
             echo "result=failure" >> $GITHUB_OUTPUT
           else
             echo "result=success" >> $GITHUB_OUTPUT
+          fi
+
+  check-results:
+    needs: run-checks
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Fail if any environment failed
+        run: |
+          echo "Checking matrix job results..."
+
+          echo '${{ toJson(needs.run-checks) }}' | jq -e '
+            to_entries | map(.value.outputs.result == "failure") | any
+          ' > /dev/null
+
+          if [ $? -eq 0 ]; then
+            echo "❌ One or more environments failed."
+            exit 1
+          else
+            echo "✅ All environments passed."
           fi
