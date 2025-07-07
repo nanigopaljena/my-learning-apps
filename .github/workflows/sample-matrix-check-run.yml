@@ -21,11 +21,18 @@ jobs:
     steps:
       - name: Set matrix dynamically
         id: set-matrix
+        shell: bash
         run: |
+          echo "Selected environment: ${{ github.event.inputs.environment }}"
+
           if [[ "${{ github.event.inputs.environment }}" == "all" ]]; then
-            echo "matrix=[\"dev\",\"test\"]" >> $GITHUB_OUTPUT
+            MATRIX='["dev", "test"]'
           else
-            echo "matrix=[\"${{ github.event.inputs.environment }}\"]" >> $GITHUB_OUTPUT
+            MATRIX='["${{ github.event.inputs.environment }}"]'
+          fi
+
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
 
   run-checks:
     needs: determine-environments
