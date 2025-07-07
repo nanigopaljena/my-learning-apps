@@ -66,4 +66,7 @@ jobs:
         id: set-result
         run: |
           if [ "${{ steps.run-check.outcome }}" == "failure" ]; then
-            echo "result=failure" >
+            echo "result=failure" >> $GITHUB_OUTPUT
+          else
+            echo "result=success" >> $GITHUB_OUTPUT
+          fi
